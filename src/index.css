@@ -1,0 +1,13 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'VT323', monospace;
+  background: linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f0f23 100%);
+  min-height: 100vh;
+  color: #e0e0e0;
+  font-size: 18px;
+}

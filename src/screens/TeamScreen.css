@@ -1,0 +1,149 @@
+.team-screen {
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+}
+
+.game-title {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #e63946;
+  font-size: 22px;
+  letter-spacing: 2px;
+}
+
+.layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 60px auto 0;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 0 0 220px;
+}
+
+.panel {
+  border: 2px solid #48cae4;
+  background: rgba(10, 25, 47, 0.9);
+  padding: 12px 16px;
+}
+
+.menu-panel {
+  border-color: #e63946;
+  flex: 0 0 180px;
+}
+
+.panel-header {
+  color: #48cae4;
+  font-size: 20px;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.team-name {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.highlight-cyan {
+  color: #48cae4;
+}
+
+.highlight-yellow {
+  color: #ffd166;
+}
+
+.central-panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.team-details {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 40px;
+}
+
+.detail-row {
+  display: contents;
+}
+
+.detail-row .label {
+  color: #b8d4e3;
+}
+
+.detail-row .value {
+  text-align: right;
+}
+
+.strips {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.strip-icon {
+  width: 16px;
+  height: 20px;
+  display: inline-block;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.strip-icon.blue {
+  background: #4361ee;
+}
+
+.strip-icon.cyan {
+  background: #48cae4;
+}
+
+.menu-item {
+  color: #52b788;
+  padding: 6px 0;
+  cursor: default;
+  font-size: 18px;
+}
+
+.menu-item.play-next {
+  color: #ffd166;
+}
+
+.menu-item.selected {
+  background: #4361ee;
+  color: white;
+  padding: 6px 8px;
+  margin: 0 -8px;
+  cursor: pointer;
+}
+
+.menu-item.selected:hover {
+  background: #5a7aff;
+}
+
+.nav-hints {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #48cae4;
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.hint-move {
+  color: #48cae4;
+}
+
+.hint-select {
+  color: #ffd166;
+}
