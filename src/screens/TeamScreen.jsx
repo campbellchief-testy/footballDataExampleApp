@@ -1,8 +1,81 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { config } from '../config'
 import './TeamScreen.css'
+
+function formatMoney(value) {
+  return value?.toLocaleString() ?? '—'
+}
+
+function formatGbp(value) {
+  if (value == null) return '—'
+  return `£${value.toLocaleString()}`
+}
 
 function TeamScreen() {
   const navigate = useNavigate()
+  const [team, setTeam] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [nextOpponent, setNextOpponent] = useState(null)
+  const [nextOpponentLoading, setNextOpponentLoading] = useState(true)
+  const [nextOpponentError, setNextOpponentError] = useState(null)
+
+  useEffect(() => {
+    const url = `${config.apiBaseUrl}/teams/${config.teamId}`
+    console.log('[TeamScreen] Fetching:', url)
+
+    fetch(url, {
+      headers: { 'x-api-key': config.apiKey },
+    })
+      .then((res) => {
+        console.log('[TeamScreen] Response:', res.status, res.statusText, res.url)
+        if (!res.ok) {
+          return res.text().then((body) => {
+            const msg = `HTTP ${res.status} ${res.statusText}${body ? `: ${body.slice(0, 200)}` : ''}`
+            console.error('[TeamScreen] Error:', msg)
+            throw new Error(msg)
+          })
+        }
+        return res.json()
+      })
+      .then((data) => {
+        console.log('[TeamScreen] Success:', data)
+        setTeam(data.team)
+        setError(null)
+      })
+      .catch((err) => {
+        const message = err.message || 'Unknown error'
+        const hint =
+          message === 'Failed to fetch'
+            ? ' (Possible causes: API server not running, CORS, or wrong URL)'
+            : ''
+        console.error('[TeamScreen] Fetch failed:', err, { url })
+        setError(`${message}${hint}`)
+        setTeam(null)
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    const url = `${config.apiBaseUrl}/teams/${config.nextOpponentTeamId}`
+    fetch(url, {
+      headers: { 'x-api-key': config.apiKey },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to fetch next opponent: ${res.status}`)
+        return res.json()
+      })
+      .then((data) => {
+        setNextOpponent(data.team)
+        setNextOpponentError(null)
+      })
+      .catch((err) => {
+        setNextOpponentError(err.message)
+        setNextOpponent(null)
+      })
+      .finally(() => setNextOpponentLoading(false))
+  }, [])
 
   return (
     <div className="team-screen">
@@ -14,34 +87,46 @@ function TeamScreen() {
           <div className="panel team-summary">
             <div className="panel-header">TEAM</div>
             <div className="panel-content">
-              <div className="team-name">Lothian Rangers</div>
-              <div>MANAGER: Campbell</div>
-              <div className="highlight-cyan">MONEY: 4,651,749</div>
-              <div>LEAGUE POS. 5</div>
-              <div>SEASON 2001/02</div>
+              {loading && <div className="team-name">Loading...</div>}
+              {error && <div className="team-name error">Error: {error}</div>}
+              {team && (
+                <>
+                  <div className="team-name">{team.name}</div>
+                  <div>MANAGER: {team.manager?.surname ?? '—'}</div>
+                  <div className="highlight-cyan">MONEY: {formatMoney(team.cashAvailable)}</div>
+                  <div>LEAGUE POS. {team.leaguePosition ?? '—'}</div>
+                  <div>SEASON 2001/02</div>
+                </>
+              )}
             </div>
           </div>
 
           <div className="panel next-opponents">
             <div className="panel-header">NEXT OPPONENTS</div>
             <div className="panel-content">
-              <div className="highlight-yellow">Spartak Moscow</div>
-              <div className="highlight-yellow">MANAGER: Romantsev</div>
-              <div>LEAGUE: SUPER LEAGUE</div>
-              <div>LEAGUE POS. 16</div>
-              <div>COMPETITION: Friendly #1</div>
-              <div>VENUE: away</div>
+              {nextOpponentLoading && <div className="highlight-yellow">Loading...</div>}
+              {nextOpponentError && <div className="highlight-yellow error">Error: {nextOpponentError}</div>}
+              {nextOpponent && (
+                <>
+                  <div className="highlight-yellow">{nextOpponent.name}</div>
+                  <div className="highlight-yellow">MANAGER: {nextOpponent.manager?.surname ?? '—'}</div>
+                  <div>LEAGUE: {nextOpponent.league ?? '—'}</div>
+                  <div>LEAGUE POS. {nextOpponent.leaguePosition ?? '—'}</div>
+                  <div>COMPETITION: Friendly #1</div>
+                  <div>VENUE: away</div>
+                </>
+              )}
             </div>
           </div>
         </div>
 
         {/* Central panel - team details */}
         <div className="panel central-panel">
-          <div className="panel-header">Lothian Rangers</div>
+          <div className="panel-header">{team?.name ?? '—'}</div>
           <div className="team-details">
             <div className="detail-row">
               <span className="label">Name</span>
-              <span className="value">Lothian Rangers</span>
+              <span className="value">{team?.name ?? '—'}</span>
             </div>
             <div className="detail-row">
               <span className="label">Strips</span>
@@ -53,35 +138,35 @@ function TeamScreen() {
             </div>
             <div className="detail-row">
               <span className="label">Country</span>
-              <span className="value">SCOTLAND</span>
+              <span className="value">{team?.country ?? '—'}</span>
             </div>
             <div className="detail-row">
               <span className="label">League</span>
-              <span className="value">SUPER LEAGUE</span>
+              <span className="value">{team?.league ?? '—'}</span>
             </div>
             <div className="detail-row">
               <span className="label">League position</span>
-              <span className="value">5</span>
+              <span className="value">{team?.leaguePosition ?? '—'}</span>
             </div>
             <div className="detail-row">
               <span className="label">Stadium capacity</span>
-              <span className="value">117000</span>
+              <span className="value">{team?.stadiumCapacity ?? '—'}</span>
             </div>
             <div className="detail-row">
               <span className="label">Support</span>
-              <span className="value">huge</span>
+              <span className="value">{team?.support ?? '—'}</span>
             </div>
             <div className="detail-row">
               <span className="label">Squad size</span>
-              <span className="value">20</span>
+              <span className="value">{team?.squadSize ?? '—'}</span>
             </div>
             <div className="detail-row">
               <span className="label">Cash available</span>
-              <span className="value highlight-cyan">4,651,749</span>
+              <span className="value highlight-cyan">{formatGbp(team?.cashAvailable)}</span>
             </div>
             <div className="detail-row">
               <span className="label">Max. overdraft</span>
-              <span className="value highlight-cyan">2,840,000</span>
+              <span className="value highlight-cyan">{formatGbp(team?.maxOverdraft)}</span>
             </div>
           </div>
         </div>
